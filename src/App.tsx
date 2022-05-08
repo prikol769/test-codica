@@ -1,26 +1,32 @@
 import React from 'react';
-import logo from './logo.svg';
-import './App.css';
+import './index.css';
+import {Routes, Route, Navigate} from 'react-router-dom';
+import HomePage from './pages/home/HomePage';
+import CityInformation from './pages/cityInformation/CityInformation';
+import {getWeatherCities, setLoading} from './store/actions/weatherActions';
+import {useDispatch} from 'react-redux';
+import {TypedDispatch} from './store';
 
-function App() {
-  return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.tsx</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
-    </div>
-  );
+
+const App: React.FC = (): JSX.Element => {
+    const dispatch = useDispatch<TypedDispatch>();
+
+    const localStorageItems = window.localStorage.getItem('selectedCities');
+    if(localStorageItems) {
+        dispatch(setLoading(-10));
+        dispatch(getWeatherCities(localStorageItems.replace(/^.|.$/g,"")));
+    }
+
+    return (
+        <Routes>
+            <Route path="/" element={<HomePage />} />
+            <Route path="/:city" element={<CityInformation />} />
+            <Route
+                path="*"
+                element={<Navigate to="/" replace />}
+            />
+        </Routes>
+    );
 }
 
 export default App;
